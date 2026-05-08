@@ -27,6 +27,15 @@ export interface ItineraryDay {
   slots: DaySlots
 }
 
+export interface EssentialTips {
+  visa?: string
+  bestTime?: string
+  transport?: string
+  safety?: string
+  currency?: string
+  mustPack?: string[]
+}
+
 export interface ItineraryContent {
   destination: string
   tripDuration: number
@@ -34,6 +43,7 @@ export interface ItineraryContent {
   recommendedDates: string
   budgetNote: string
   days: ItineraryDay[]
+  essentialTips?: EssentialTips
 }
 
 function buildSystemPrompt(): string {
