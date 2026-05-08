@@ -6,6 +6,8 @@ import TripCard from '../components/TripCard'
 import CreateTripModal from '../components/CreateTripModal'
 import JoinTripModal from '../components/JoinTripModal'
 import axios from 'axios'
+import { useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '../stores/auth.store'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -13,6 +15,8 @@ export default function DashboardPage() {
   const [showCreate, setShowCreate] = useState(false)
   const [showJoin, setShowJoin]     = useState(false)
   const { theme, toggle: toggleTheme } = useTheme()
+  const queryClient = useQueryClient()
+  const setUser = useAuthStore((s) => s.setUser)
 
   const totalTrips     = trips?.length ?? 0
   const planningCount  = trips?.filter((t) => t.status === 'PLANNING').length ?? 0
@@ -21,6 +25,9 @@ export default function DashboardPage() {
 
   async function handleLogout() {
     await axios.post(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`, {}, { withCredentials: true })
+    // Clear all cached state so ProtectedRoute doesn't bounce back to dashboard
+    setUser(null)
+    queryClient.clear()
     window.location.href = '/login'
   }
 
