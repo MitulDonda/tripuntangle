@@ -20,10 +20,13 @@ export function verifyToken(token: string): JwtPayload {
 
 export function setAuthCookie(res: Response, payload: JwtPayload) {
   const token = signToken(payload)
+  const isProd = process.env.NODE_ENV === 'production'
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',   // 'lax' allows redirect from Google back to app
+    secure: isProd,
+    // 'none' required for cross-domain (Vercel frontend ↔ Render backend)
+    // 'lax' for local dev (same origin)
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: THIRTY_DAYS_MS,
   })
   return token
