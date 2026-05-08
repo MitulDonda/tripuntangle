@@ -128,7 +128,7 @@ export default function InviteModal({ tripId, inviteCode, shortCode, onClose }: 
                 {r.status === 'sent'           && ' — ✓ Email sent'}
                 {r.status === 'already_member' && ' — already a member'}
                 {r.status === 'email_failed'   && (
-                  <span> — email failed. <span style={{ color: 'var(--text-muted)' }}>Share link manually instead.</span></span>
+                  <span> — email failed: <span style={{ color: 'var(--text-muted)' }}>{r.reason ?? 'unknown error'}</span></span>
                 )}
               </div>
             ))}
