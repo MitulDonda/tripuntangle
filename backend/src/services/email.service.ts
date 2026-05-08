@@ -24,20 +24,7 @@ export async function sendInviteEmail(opts: {
   const html = buildEmailHtml({ tripName, destination, creatorName, inviteUrl })
   const subject = `You've been invited to plan ${tripName} on TripUntangle!`
 
-  // 1️⃣ Try Nodemailer (Gmail SMTP) first — works for any recipient
-  const smtp = createSmtpTransport()
-  if (smtp) {
-    await smtp.sendMail({
-      from: `"TripUntangle" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html,
-    })
-    console.log(`[Email] Sent via Gmail SMTP → ${to}`)
-    return { success: true, via: 'smtp' }
-  }
-
-  // 2️⃣ Try Resend (only works for verified domains / own email in free tier)
+  // 1️⃣ Try Resend first (cloud-friendly, free tier 3000 emails/month)
   if (resend) {
     const result = await resend.emails.send({
       from: 'TripUntangle <onboarding@resend.dev>',
@@ -50,6 +37,19 @@ export async function sendInviteEmail(opts: {
     }
     console.log(`[Email] Sent via Resend → ${to}`)
     return { success: true, via: 'resend' }
+  }
+
+  // 2️⃣ Fallback: Gmail SMTP
+  const smtp = createSmtpTransport()
+  if (smtp) {
+    await smtp.sendMail({
+      from: `"TripUntangle" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html,
+    })
+    console.log(`[Email] Sent via Gmail SMTP → ${to}`)
+    return { success: true, via: 'smtp' }
   }
 
   // 3️⃣ No email provider configured — log invite link so owner can share manually
