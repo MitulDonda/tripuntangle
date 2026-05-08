@@ -9,7 +9,7 @@ export function useAuth() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['me'],
     queryFn: async () => {
-      const res = await axios.get('/auth/me', { withCredentials: true })
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/me`, { withCredentials: true })
       return res.data
     },
     retry: false,

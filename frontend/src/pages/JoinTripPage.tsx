@@ -14,7 +14,7 @@ export default function JoinTripPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       sessionStorage.setItem('pendingInvite', inviteCode ?? '')
-      window.location.href = '/auth/google'
+      window.location.href = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/google`
     }
   }, [authLoading, isAuthenticated, inviteCode])
 

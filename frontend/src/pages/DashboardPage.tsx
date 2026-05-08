@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const firstName      = user?.name?.split(' ')[0] ?? ''
 
   async function handleLogout() {
-    await axios.post('/auth/logout', {}, { withCredentials: true })
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`, {}, { withCredentials: true })
     window.location.href = '/login'
   }
 
