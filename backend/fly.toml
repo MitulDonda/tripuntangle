@@ -1,5 +1,5 @@
 app = "tripuntangle-backend"
-primary_region = "sin"  # Singapore — closest to India
+primary_region = "bom"  # Mumbai — closest to India
 
 [build]
 
