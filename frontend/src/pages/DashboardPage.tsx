@@ -23,12 +23,12 @@ export default function DashboardPage() {
   const finalisedCount = trips?.filter((t) => t.status === 'FINALISED').length ?? 0
   const firstName      = user?.name?.split(' ')[0] ?? ''
 
-  async function handleLogout() {
-    await axios.post(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`, {}, { withCredentials: true })
-    // Clear all cached state so ProtectedRoute doesn't bounce back to dashboard
+  function handleLogout() {
+    // Clear client state immediately
     setUser(null)
     queryClient.clear()
-    window.location.href = '/login'
+    // Navigate browser directly to backend logout — backend clears cookie then redirects to /login
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout-redirect`
   }
 
   return (

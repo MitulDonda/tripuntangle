@@ -43,8 +43,14 @@ authRouter.get('/me', requireAuth, async (req: AuthRequest, res) => {
   res.json(user)
 })
 
-// Logout
+// Logout (API - for programmatic use)
 authRouter.post('/logout', (_req, res) => {
   clearAuthCookie(res)
   res.json({ ok: true })
+})
+
+// Logout redirect — browser navigates here directly, cookie cleared, then redirect to login
+authRouter.get('/logout-redirect', (_req, res) => {
+  clearAuthCookie(res)
+  res.redirect(`${process.env.FRONTEND_URL}/login`)
 })
