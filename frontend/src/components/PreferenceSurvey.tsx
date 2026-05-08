@@ -111,9 +111,9 @@ export default function PreferenceSurvey({ tripId, travelStart, travelEnd, onDon
   })()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
          style={{ background: 'var(--overlay)', backdropFilter: 'blur(6px)' }}>
-      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl"
+      <div className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
 
         {/* Progress bar */}
@@ -124,7 +124,7 @@ export default function PreferenceSurvey({ tripId, travelStart, travelEnd, onDon
           />
         </div>
 
-        <div className="p-6">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
           {/* Step indicator */}
           <div className="flex items-center justify-between mb-5">
             <span className="text-xs font-medium" style={{ color: 'var(--text-muted)', fontFamily: 'Sora, sans-serif' }}>

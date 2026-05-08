@@ -89,14 +89,14 @@ export default function ItineraryView({ content, itineraryId, tripId, votesMap, 
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
           {content.conflictSummary}
         </p>
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 mt-4">
           <div className="rounded-lg p-3" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
             <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>📅 Recommended Dates</p>
-            <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{content.recommendedDates}</p>
+            <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--text-primary)' }}>{content.recommendedDates}</p>
           </div>
           <div className="rounded-lg p-3" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
             <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>💰 Budget</p>
-            <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{content.budgetNote}</p>
+            <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--text-primary)' }}>{content.budgetNote}</p>
           </div>
         </div>
       </div>

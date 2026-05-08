@@ -162,20 +162,20 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
     <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       {/* Nav */}
       <header style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <button onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-1 text-sm transition hover:opacity-70"
+                  className="flex items-center gap-1 text-sm transition hover:opacity-70 shrink-0"
                   style={{ color: 'var(--accent-sky)' }}>
-            ← Dashboard
+            ← <span className="hidden sm:inline">Dashboard</span>
           </button>
-          <span className="font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'Fraunces, serif' }}>
+          <span className="font-bold truncate" style={{ color: 'var(--text-primary)', fontFamily: 'Fraunces, serif', fontSize: 'clamp(0.85rem, 3vw, 1rem)' }}>
             ✈️ TripUntangle
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={toggleTheme}
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="w-9 h-9 flex items-center justify-center rounded-lg text-base transition hover:opacity-80"
+              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg text-sm transition hover:opacity-80"
               style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
@@ -183,7 +183,7 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
             {hasItinerary && (
               <button
                 onClick={() => setShowChat((v) => !v)}
-                className="text-sm px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90 lg:hidden"
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90 lg:hidden"
                 style={{ background: showChat ? 'var(--accent-sky)' : 'var(--bg-elevated)', color: showChat ? '#fff' : 'var(--text-muted)', border: '1px solid var(--border)' }}
               >
                 💬 {showChat ? 'Hide' : 'Chat'}
@@ -192,14 +192,14 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
             {isOwner && (
               <>
                 <button onClick={() => setShowInvite(true)}
-                        className="text-sm px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90"
+                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90"
                         style={{ background: 'var(--accent-forest)', color: '#fff', fontFamily: 'Sora, sans-serif' }}>
-                  + Invite
+                  + <span className="hidden sm:inline">Invite</span><span className="sm:hidden">Invite</span>
                 </button>
                 <button onClick={() => setShowDeleteConfirm(true)}
-                        className="text-sm px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90"
+                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 rounded-lg font-medium transition hover:opacity-90"
                         style={{ background: 'var(--accent-bloom-bg)', color: 'var(--accent-bloom)', border: '1px solid var(--accent-bloom)', fontFamily: 'Sora, sans-serif' }}>
-                  🗑️ Delete
+                  🗑️<span className="hidden sm:inline"> Delete</span>
                 </button>
               </>
             )}
@@ -207,12 +207,12 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Trip header */}
         <div className="mb-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-semibold mb-1"
+              <h1 className="text-2xl sm:text-3xl font-semibold mb-1"
                   style={{ color: 'var(--text-primary)', fontFamily: 'Fraunces, serif', letterSpacing: '-0.02em' }}>
                 {trip.name}
               </h1>
@@ -287,25 +287,25 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
             <h2 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>📋 Your Preferences</h2>
             {myPreference ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
                        style={{ background: 'var(--accent-forest-bg)', color: 'var(--accent-forest)' }}>✓</div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Preferences submitted</p>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
                       {myPreference.budgetTier} · {myPreference.vibes?.join(', ')}
                     </p>
                   </div>
                 </div>
-                <button onClick={() => setShowSurvey(true)} className="text-sm transition hover:opacity-70"
+                <button onClick={() => setShowSurvey(true)} className="text-sm transition hover:opacity-70 shrink-0"
                         style={{ color: 'var(--accent-sky)' }}>Edit</button>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Tell the AI what you want from this trip.</p>
                 <button onClick={() => setShowSurvey(true)}
-                        className="px-4 py-2 rounded-lg text-sm font-medium transition hover:opacity-90"
+                        className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition hover:opacity-90"
                         style={{ background: 'var(--accent-forest)', color: '#fff' }}>
                   Fill Preferences
                 </button>
@@ -329,9 +329,9 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
             )}
 
             {!isOwner && myPreference && (
-              <div className="mt-4 pt-4 flex items-center gap-3" style={{ borderTop: '1px solid var(--border)' }}>
-                <div className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: 'var(--accent-sun)' }} />
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              <div className="mt-4 pt-4 flex items-start gap-3" style={{ borderTop: '1px solid var(--border)' }}>
+                <div className="w-2 h-2 rounded-full animate-pulse shrink-0 mt-1.5" style={{ background: 'var(--accent-sun)' }} />
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                   Preferences saved — waiting for the trip owner to generate the itinerary.
                 </p>
               </div>
@@ -382,7 +382,7 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
               <p className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
                 ✨ Refine itinerary with AI
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   value={refineInput}
                   onChange={(e) => { setRefineInput(e.target.value); setRefineError(null) }}
@@ -394,7 +394,7 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
                       })
                     }
                   }}
-                  placeholder="e.g. Replace Day 2 evening with a rooftop dinner, add more adventure activities…"
+                  placeholder="e.g. Replace Day 2 evening with a rooftop dinner…"
                   disabled={refine.isPending}
                   className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
                   style={{
@@ -412,11 +412,11 @@ const [chatTab, setChatTab] = useState<'ai' | 'group'>('group')
                     })
                   }}
                   disabled={!refineInput.trim() || refine.isPending}
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold transition hover:opacity-90 disabled:opacity-40 shrink-0"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-lg text-sm font-semibold transition hover:opacity-90 disabled:opacity-40 shrink-0"
                   style={{ background: 'var(--accent-forest)', color: '#fff' }}
                 >
                   {refine.isPending ? (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center gap-2">
                       <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
                       Updating…
                     </span>

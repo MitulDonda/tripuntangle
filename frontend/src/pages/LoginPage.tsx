@@ -94,7 +94,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel: login form ─────────────────────────── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center px-5 sm:px-6 py-10 sm:py-12 relative overflow-hidden">
 
         {/* Subtle background orbs (mobile visible) */}
         <div className="absolute top-1/4 right-1/4 w-72 h-72 rounded-full pointer-events-none animate-glow-pulse"

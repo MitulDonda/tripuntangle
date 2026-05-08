@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
       {/* ── Navbar ─────────────────────────────────────────── */}
       <header style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
                  style={{ background: 'linear-gradient(135deg, var(--accent-forest-bg), transparent)', border: '1px solid rgba(74,155,111,0.3)' }}>
@@ -79,7 +79,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* ── Hero banner ──────────────────────────────────── */}
         <div className="relative rounded-2xl overflow-hidden mb-10 animate-fade-in-up"
@@ -98,12 +98,12 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <div className="relative z-10 px-8 py-7">
+          <div className="relative z-10 px-5 sm:px-8 py-5 sm:py-7">
             <p className="text-xs font-semibold tracking-widest uppercase mb-3"
                style={{ color: 'var(--accent-gold)', fontFamily: 'Sora, sans-serif', letterSpacing: '0.15em' }}>
               Your journeys
             </p>
-            <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: 'clamp(1.5rem, 5vw, 2.4rem)', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               {firstName ? (
                 <>Good to see you, <em style={{ fontStyle: 'italic', color: 'var(--accent-forest)' }}>{firstName}</em> 👋</>
               ) : 'Welcome back 👋'}
@@ -113,7 +113,7 @@ export default function DashboardPage() {
             </p>
 
             {totalTrips > 0 && (
-              <div className="flex gap-3 mt-5">
+              <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-5">
                 <StatChip label="Trips" value={totalTrips} color="var(--accent-forest)" bg="var(--stat-chip-bg)" border="var(--stat-chip-border)" />
                 <StatChip label="Planning" value={planningCount} color="var(--accent-sun)" bg="rgba(245,166,35,0.08)" border="rgba(245,166,35,0.2)" />
                 <StatChip label="Finalised" value={finalisedCount} color="var(--accent-sky)" bg="rgba(91,155,213,0.08)" border="rgba(91,155,213,0.2)" />
@@ -123,7 +123,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Section header ───────────────────────────────── */}
-        <div className="flex items-center justify-between mb-6 animate-fade-in-up delay-150">
+        <div className="flex items-center justify-between mb-5 sm:mb-6 animate-fade-in-up delay-150">
           <div>
             <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.35rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
               My Trips

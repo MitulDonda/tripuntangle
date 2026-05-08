@@ -39,9 +39,9 @@ export default function JoinTripModal({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
          style={{ background: 'var(--overlay)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+      <div className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 flex flex-col gap-4 sm:gap-5"
            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
 
         {/* Header */}

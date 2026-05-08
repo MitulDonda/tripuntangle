@@ -53,13 +53,13 @@ export default function ActivityCard({ activity, slot }: Props) {
       </div>
 
       {/* Cost + tip */}
-      <div className="flex items-center gap-3 mt-1">
-        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+      <div className="flex flex-wrap items-start gap-2 mt-1">
+        <span className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0"
               style={{ background: 'var(--accent-forest-bg)', color: 'var(--accent-forest)' }}>
           {activity.estimatedCost}
         </span>
         {activity.tips && (
-          <p className="text-xs italic truncate" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-xs italic leading-relaxed" style={{ color: 'var(--text-muted)' }}>
             💡 {activity.tips}
           </p>
         )}
