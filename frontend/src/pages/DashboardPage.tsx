@@ -5,7 +5,6 @@ import { useTheme } from '../hooks/useTheme'
 import TripCard from '../components/TripCard'
 import CreateTripModal from '../components/CreateTripModal'
 import JoinTripModal from '../components/JoinTripModal'
-import axios from 'axios'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../stores/auth.store'
 
