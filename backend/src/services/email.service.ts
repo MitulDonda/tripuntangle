@@ -24,37 +24,52 @@ export async function sendInviteEmail(opts: {
   const html = buildEmailHtml({ tripName, destination, creatorName, inviteUrl })
   const subject = `You've been invited to plan ${tripName} on TripUntangle!`
 
-  // 1️⃣ Try Resend first (cloud-friendly, free tier 3000 emails/month)
+  const errors: string[] = []
+
+  // 1️⃣ Try Resend first (cloud-friendly, free tier 3 000 emails/month)
   if (resend) {
-    const result = await resend.emails.send({
-      from: 'TripUntangle <onboarding@resend.dev>',
-      to,
-      subject,
-      html,
-    })
-    if (result.error) {
-      throw new Error(`Resend error: ${result.error.message}`)
+    try {
+      const result = await resend.emails.send({
+        from: 'TripUntangle <onboarding@resend.dev>',
+        to,
+        subject,
+        html,
+      })
+      if (result.error) {
+        throw new Error(result.error.message)
+      }
+      console.log(`[Email] Sent via Resend → ${to}`)
+      return { success: true, via: 'resend' }
+    } catch (err: any) {
+      const msg = err?.message ?? String(err)
+      console.warn(`[Email] Resend failed (${msg}), trying SMTP fallback…`)
+      errors.push(`Resend: ${msg}`)
     }
-    console.log(`[Email] Sent via Resend → ${to}`)
-    return { success: true, via: 'resend' }
   }
 
   // 2️⃣ Fallback: Gmail SMTP
   const smtp = createSmtpTransport()
   if (smtp) {
-    await smtp.sendMail({
-      from: `"TripUntangle" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html,
-    })
-    console.log(`[Email] Sent via Gmail SMTP → ${to}`)
-    return { success: true, via: 'smtp' }
+    try {
+      await smtp.sendMail({
+        from: `"TripUntangle" <${process.env.SMTP_USER}>`,
+        to,
+        subject,
+        html,
+      })
+      console.log(`[Email] Sent via Gmail SMTP → ${to}`)
+      return { success: true, via: 'smtp' }
+    } catch (err: any) {
+      const msg = err?.message ?? String(err)
+      console.warn(`[Email] SMTP failed: ${msg}`)
+      errors.push(`SMTP: ${msg}`)
+    }
   }
 
-  // 3️⃣ No email provider configured — log invite link so owner can share manually
-  console.log(`[Email] No provider configured. Invite link for ${to}: ${inviteUrl}`)
-  throw new Error('No email provider configured. Add SMTP_USER+SMTP_PASS (Gmail) or RESEND_API_KEY to .env')
+  // 3️⃣ No provider worked — surface a clear message so the invite URL is shown in the UI
+  const detail = errors.length ? errors.join(' | ') : 'No email provider configured'
+  console.log(`[Email] All providers failed for ${to}. Invite link: ${inviteUrl}`)
+  throw new Error(detail)
 }
 
 function buildEmailHtml(opts: {
