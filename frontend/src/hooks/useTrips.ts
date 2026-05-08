@@ -11,6 +11,7 @@ export interface TripMember {
   id: string
   role: 'OWNER' | 'MEMBER'
   inviteStatus: 'PENDING' | 'ACCEPTED'
+  inviteEmail?: string | null
   user: TripMemberUser
 }
 
