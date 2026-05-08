@@ -1,5 +1,8 @@
 FROM node:20-alpine
 
+# Install OpenSSL for Prisma Query Engine (required for SSL DB connections)
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy package files
