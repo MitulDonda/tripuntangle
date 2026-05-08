@@ -1,0 +1,197 @@
+// TripUntangle Prisma Schema — v1.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   // pooler — used at runtime
+  directUrl = env("DIRECT_URL")     // direct — used by prisma migrate/generate
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────────────
+
+enum TripStatus {
+  PLANNING
+  GENERATING
+  FINALISED
+  ARCHIVED
+}
+
+enum MemberRole {
+  OWNER
+  MEMBER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum BudgetTier {
+  BACKPACKER
+  FLASHPACKER
+  LUXURY
+}
+
+enum Vibe {
+  NIGHTLIFE
+  NATURE
+  ADVENTURE
+  RELAXATION
+  CULTURE
+  FOOD_AND_DRINK
+  WELLNESS
+}
+
+enum Dietary {
+  VEGETARIAN
+  VEGAN
+  NON_VEGETARIAN
+  GLUTEN_FREE
+  NUT_ALLERGY
+  OTHER
+}
+
+enum SenderType {
+  USER
+  AI
+}
+
+enum VoteValue {
+  THUMBS_UP
+  THUMBS_DOWN
+}
+
+// ─── Models ────────────────────────────────────────────────────────────────
+
+model User {
+  id         String   @id @default(cuid())
+  googleId   String   @unique @map("google_id")
+  email      String   @unique
+  name       String
+  avatarUrl  String?  @map("avatar_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  trips         TripMember[]
+  messages      ChatMessage[]
+  groupMessages GroupMessage[]
+
+  @@map("users")
+}
+
+model Trip {
+  id          String     @id @default(cuid())
+  name        String     @db.VarChar(60)
+  destination String
+  travelStart DateTime?  @map("travel_start")
+  travelEnd   DateTime?  @map("travel_end")
+  status      TripStatus @default(PLANNING)
+  inviteCode  String     @unique @map("invite_code")   // UUID
+  shortCode   String     @unique @map("short_code")    // 6-char
+  inviteExpiry DateTime  @map("invite_expiry")
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  members       TripMember[]
+  itineraries   Itinerary[]
+  messages      ChatMessage[]
+  groupMessages GroupMessage[]
+  votes         Vote[]
+
+  @@map("trips")
+}
+
+model TripMember {
+  id           String       @id @default(cuid())
+  tripId       String       @map("trip_id")
+  userId       String       @map("user_id")
+  role         MemberRole   @default(MEMBER)
+  inviteStatus InviteStatus @default(PENDING) @map("invite_status")
+  inviteEmail  String?      @map("invite_email")  // for pending non-users
+  joinedAt     DateTime?    @map("joined_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  trip         Trip         @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preference   Preference?
+  votes        Vote[]
+
+  @@unique([tripId, userId])
+  @@map("trip_members")
+}
+
+model Preference {
+  id              String    @id @default(cuid())
+  tripMemberId    String    @unique @map("trip_member_id")
+  availStart      DateTime  @map("avail_start")
+  availEnd        DateTime  @map("avail_end")
+  durationDays    Int       @map("duration_days")   // 3–14
+  budgetTier      BudgetTier @map("budget_tier")
+  vibes           Vibe[]
+  dietary         Dietary[]
+  wildcardText    String?   @map("wildcard_text")   // max 300 chars, encrypted
+  submittedAt     DateTime  @default(now()) @map("submitted_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  member          TripMember @relation(fields: [tripMemberId], references: [id], onDelete: Cascade)
+
+  @@map("preferences")
+}
+
+model Itinerary {
+  id          String   @id @default(cuid())
+  tripId      String   @map("trip_id")
+  version     Int      @default(1)
+  content     Json     // structured day/activity objects (JSONB)
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  votes       Vote[]
+
+  @@map("itineraries")
+}
+
+model ChatMessage {
+  id         String     @id @default(cuid())
+  tripId     String     @map("trip_id")
+  senderType SenderType @map("sender_type")
+  senderId   String?    @map("sender_id")   // null for AI messages
+  content    String
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  sender     User?      @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@map("chat_messages")
+}
+
+model GroupMessage {
+  id        String   @id @default(cuid())
+  tripId    String   @map("trip_id")
+  senderId  String   @map("sender_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("group_messages")
+}
+
+model Vote {
+  id           String     @id @default(cuid())
+  tripMemberId String     @map("trip_member_id")
+  itineraryId  String     @map("itinerary_id")
+  activityId   String     @map("activity_id")   // references activity within itinerary JSON
+  value        VoteValue
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  member       TripMember @relation(fields: [tripMemberId], references: [id], onDelete: Cascade)
+  itinerary    Itinerary  @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  trip         Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId       String     @map("trip_id")
+
+  @@unique([tripMemberId, itineraryId, activityId])
+  @@map("votes")
+}

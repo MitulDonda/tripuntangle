@@ -1,0 +1,45 @@
+/* Ghibli Dark CSS custom properties (PRD §3.1) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500&family=DM+Sans:ital,wght@0,300;1,300&display=swap');
+
+:root {
+  --bg-base:       #0D1117;
+  --bg-surface:    #161B22;
+  --bg-elevated:   #21262D;
+  --accent-forest: #3D8B5E;
+  --accent-sky:    #5B9BD5;
+  --accent-sun:    #F5A623;
+  --accent-bloom:  #C65D7B;
+  --text-primary:  #E6EDF3;
+  --text-muted:    #7D8590;
+  --border:        #30363D;
+  --radius:        0.5rem;
+}
+
+/* Shimmer skeleton loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 0%,
+    #2d333b 50%,
+    var(--bg-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Destination image vignette */
+.img-vignette {
+  position: relative;
+}
+.img-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}

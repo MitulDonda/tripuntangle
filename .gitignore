@@ -1,0 +1,22 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+*.env.local
+.DS_Store
+Thumbs.db
+
+# Editor / OS
+.vscode/
+.idea/
+*.log
+
+# Local Claude Code state
+.claude/
+.agents/
+skills-lock.json
+
+# Prisma local migrations
+backend/prisma/migrations/
