@@ -123,7 +123,7 @@ export default function LoginPage() {
 
             {/* Google button */}
             <a
-              href="/auth/google"
+              href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/google`}
               className="flex items-center justify-center gap-3 w-full py-3.5 px-5 rounded-xl font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.98] group relative overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, var(--accent-forest) 0%, #357a52 100%)',
