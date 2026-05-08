@@ -33,7 +33,12 @@ export function setAuthCookie(res: Response, payload: JwtPayload) {
 }
 
 export function clearAuthCookie(res: Response) {
-  res.clearCookie(COOKIE_NAME)
+  const isProd = process.env.NODE_ENV === 'production'
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+  })
 }
 
 export { COOKIE_NAME }
