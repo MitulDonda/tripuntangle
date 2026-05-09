@@ -1,18 +1,14 @@
-import { Resend } from 'resend'
 import nodemailer from 'nodemailer'
 
-// ── Resend client (disabled — free tier blocks sending to unverified domains) ─
-const resend = null // process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-
 // ── Nodemailer SMTP transporter (Gmail app password) ─────────────────────────
-// Use port 587 + STARTTLS explicitly — avoids IPv6 ENETUNREACH on cloud servers
-// that occurs when `service: 'gmail'` resolves to an IPv6 address on port 465.
+// Port 587 + STARTTLS — avoids IPv6 ENETUNREACH on cloud servers (Render)
+// that occurs when service:'gmail' resolves to an IPv6 address on port 465.
 function createSmtpTransport() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return null
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false,      // STARTTLS (upgrades after connect)
+    secure: false,     // STARTTLS (upgrades after connect)
     requireTLS: true,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     tls: { rejectUnauthorized: false },
@@ -30,52 +26,22 @@ export async function sendInviteEmail(opts: {
   const html = buildEmailHtml({ tripName, destination, creatorName, inviteUrl })
   const subject = `You've been invited to plan ${tripName} on TripUntangle!`
 
-  const errors: string[] = []
-
-  // 1️⃣ Try Resend first (cloud-friendly, free tier 3 000 emails/month)
-  if (resend) {
-    try {
-      const result = await resend.emails.send({
-        from: 'TripUntangle <onboarding@resend.dev>',
-        to,
-        subject,
-        html,
-      })
-      if (result.error) {
-        throw new Error(result.error.message)
-      }
-      console.log(`[Email] Sent via Resend → ${to}`)
-      return { success: true, via: 'resend' }
-    } catch (err: any) {
-      const msg = err?.message ?? String(err)
-      console.warn(`[Email] Resend failed (${msg}), trying SMTP fallback…`)
-      errors.push(`Resend: ${msg}`)
-    }
-  }
-
-  // 2️⃣ Fallback: Gmail SMTP
+  // Gmail SMTP
   const smtp = createSmtpTransport()
   if (smtp) {
-    try {
-      await smtp.sendMail({
-        from: `"TripUntangle" <${process.env.SMTP_USER}>`,
-        to,
-        subject,
-        html,
-      })
-      console.log(`[Email] Sent via Gmail SMTP → ${to}`)
-      return { success: true, via: 'smtp' }
-    } catch (err: any) {
-      const msg = err?.message ?? String(err)
-      console.warn(`[Email] SMTP failed: ${msg}`)
-      errors.push(`SMTP: ${msg}`)
-    }
+    await smtp.sendMail({
+      from: `"TripUntangle" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html,
+    })
+    console.log(`[Email] Sent via Gmail SMTP → ${to}`)
+    return { success: true, via: 'smtp' }
   }
 
-  // 3️⃣ No provider worked — surface a clear message so the invite URL is shown in the UI
-  const detail = errors.length ? errors.join(' | ') : 'No email provider configured'
-  console.log(`[Email] All providers failed for ${to}. Invite link: ${inviteUrl}`)
-  throw new Error(detail)
+  // No provider configured
+  console.log(`[Email] No provider configured. Invite link for ${to}: ${inviteUrl}`)
+  throw new Error('No email provider configured. Add SMTP_USER + SMTP_PASS (Gmail App Password) to your environment variables.')
 }
 
 function buildEmailHtml(opts: {
