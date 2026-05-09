@@ -5,11 +5,17 @@ import nodemailer from 'nodemailer'
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // ── Nodemailer SMTP transporter (Gmail app password) ─────────────────────────
+// Use port 587 + STARTTLS explicitly — avoids IPv6 ENETUNREACH on cloud servers
+// that occurs when `service: 'gmail'` resolves to an IPv6 address on port 465.
 function createSmtpTransport() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return null
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,      // STARTTLS (upgrades after connect)
+    requireTLS: true,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    tls: { rejectUnauthorized: false },
   })
 }
 
