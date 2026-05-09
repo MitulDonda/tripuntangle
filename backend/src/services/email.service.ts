@@ -1,20 +1,64 @@
+import https from 'https'
 import nodemailer from 'nodemailer'
 
-// ── Nodemailer SMTP transporter (Gmail app password) ─────────────────────────
-// Port 587 + STARTTLS — avoids IPv6 ENETUNREACH on cloud servers (Render)
-// that occurs when service:'gmail' resolves to an IPv6 address on port 465.
+// ── Brevo (HTTP API) ──────────────────────────────────────────────────────────
+async function sendViaBrevo(opts: {
+  to: string; subject: string; html: string
+}): Promise<void> {
+  const apiKey = process.env.BREVO_API_KEY
+  if (!apiKey) throw new Error('BREVO_API_KEY not set')
+
+  const body = JSON.stringify({
+    sender:      { name: 'TripUntangle', email: process.env.SMTP_USER || 'ai.mdonda93@gmail.com' },
+    to:          [{ email: opts.to }],
+    subject:     opts.subject,
+    htmlContent: opts.html,
+  })
+
+  await new Promise<void>((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'api.brevo.com',
+        path:     '/v3/smtp/email',
+        method:   'POST',
+        headers: {
+          'accept':       'application/json',
+          'content-type': 'application/json',
+          'api-key':      apiKey,
+        },
+      },
+      (res) => {
+        let data = ''
+        res.on('data', (chunk) => { data += chunk })
+        res.on('end', () => {
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            resolve()
+          } else {
+            reject(new Error(`Brevo ${res.statusCode}: ${data}`))
+          }
+        })
+      }
+    )
+    req.on('error', reject)
+    req.write(body)
+    req.end()
+  })
+}
+
+// ── Gmail SMTP (port 587 / STARTTLS) ─────────────────────────────────────────
 function createSmtpTransport() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return null
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,     // STARTTLS (upgrades after connect)
+    host:       'smtp.gmail.com',
+    port:       587,
+    secure:     false,
     requireTLS: true,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     tls: { rejectUnauthorized: false },
   })
 }
 
+// ── Public API ────────────────────────────────────────────────────────────────
 export async function sendInviteEmail(opts: {
   to: string
   tripName: string
@@ -23,27 +67,50 @@ export async function sendInviteEmail(opts: {
   inviteUrl: string
 }) {
   const { to, tripName, destination, creatorName, inviteUrl } = opts
-  const html = buildEmailHtml({ tripName, destination, creatorName, inviteUrl })
+  const html    = buildEmailHtml({ tripName, destination, creatorName, inviteUrl })
   const subject = `You've been invited to plan ${tripName} on TripUntangle!`
 
-  // Gmail SMTP
-  const smtp = createSmtpTransport()
-  if (smtp) {
-    await smtp.sendMail({
-      from: `"TripUntangle" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html,
-    })
-    console.log(`[Email] Sent via Gmail SMTP → ${to}`)
-    return { success: true, via: 'smtp' }
+  const errors: string[] = []
+
+  // 1️⃣ Brevo HTTP API (no SMTP ports — works on all cloud hosts)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await sendViaBrevo({ to, subject, html })
+      console.log(`[Email] Sent via Brevo → ${to}`)
+      return { success: true, via: 'brevo' }
+    } catch (err: any) {
+      const msg = err?.message ?? String(err)
+      console.warn(`[Email] Brevo failed (${msg}), trying SMTP…`)
+      errors.push(`Brevo: ${msg}`)
+    }
   }
 
-  // No provider configured
-  console.log(`[Email] No provider configured. Invite link for ${to}: ${inviteUrl}`)
-  throw new Error('No email provider configured. Add SMTP_USER + SMTP_PASS (Gmail App Password) to your environment variables.')
+  // 2️⃣ Gmail SMTP fallback
+  const smtp = createSmtpTransport()
+  if (smtp) {
+    try {
+      await smtp.sendMail({
+        from:    `"TripUntangle" <${process.env.SMTP_USER}>`,
+        to,
+        subject,
+        html,
+      })
+      console.log(`[Email] Sent via Gmail SMTP → ${to}`)
+      return { success: true, via: 'smtp' }
+    } catch (err: any) {
+      const msg = err?.message ?? String(err)
+      console.warn(`[Email] SMTP failed: ${msg}`)
+      errors.push(`SMTP: ${msg}`)
+    }
+  }
+
+  // 3️⃣ Nothing worked
+  console.log(`[Email] All providers failed for ${to}. Invite link: ${inviteUrl}`)
+  const detail = errors.length ? errors.join(' | ') : 'No email provider configured'
+  throw new Error(detail)
 }
 
+// ── Email template ────────────────────────────────────────────────────────────
 function buildEmailHtml(opts: {
   tripName: string
   destination: string
