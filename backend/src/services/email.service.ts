@@ -21,10 +21,12 @@ async function sendViaBrevo(opts: {
         hostname: 'api.brevo.com',
         path:     '/v3/smtp/email',
         method:   'POST',
+        timeout:  10000, // 10 s — fail fast if IP is blocked
         headers: {
-          'accept':       'application/json',
-          'content-type': 'application/json',
-          'api-key':      apiKey,
+          'accept':         'application/json',
+          'content-type':   'application/json',
+          'content-length': Buffer.byteLength(body),
+          'api-key':        apiKey,
         },
       },
       (res) => {
@@ -39,6 +41,7 @@ async function sendViaBrevo(opts: {
         })
       }
     )
+    req.on('timeout', () => { req.destroy(new Error('Brevo request timed out (IP blocking may be active)')) })
     req.on('error', reject)
     req.write(body)
     req.end()
