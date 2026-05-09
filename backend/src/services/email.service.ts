@@ -1,8 +1,8 @@
 import { Resend } from 'resend'
 import nodemailer from 'nodemailer'
 
-// ── Resend client (optional) ──────────────────────────────────────────────────
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+// ── Resend client (disabled — free tier blocks sending to unverified domains) ─
+const resend = null // process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // ── Nodemailer SMTP transporter (Gmail app password) ─────────────────────────
 // Use port 587 + STARTTLS explicitly — avoids IPv6 ENETUNREACH on cloud servers
