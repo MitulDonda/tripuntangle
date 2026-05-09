@@ -43,6 +43,23 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', ts: new Date().toISOString() })
 })
 
+// ── Email diagnostics (temporary) ────────────────────────────────────────────
+app.get('/debug/email', async (_req, res) => {
+  const { sendInviteEmail } = await import('./services/email.service')
+  try {
+    await sendInviteEmail({
+      to:          process.env.SMTP_USER || 'test@example.com',
+      tripName:    'Test Trip',
+      destination: 'Paris',
+      creatorName: 'Debug',
+      inviteUrl:   'https://tripuntangle.vercel.app',
+    })
+    res.json({ ok: true, message: 'Email sent! Check your inbox.' })
+  } catch (err: any) {
+    res.json({ ok: false, error: err.message })
+  }
+})
+
 setupSocketHandlers(io)
 startGenerationWorker(io)
 
